@@ -203,14 +203,14 @@ def turnBlack(pic):
 #plays main background music
 def playB():
   dir = os.path.dirname(__file__)#uses the parent folder of the program
-  path = dir + "\\"+"dmap.wav"#looks for eggs.txt in the parent directory
+  path = dir + "\\"+"dmap.wav"
   sd=makeSound(path)
   play(sd)
   
 #death sound  
 def playD():
   dir = os.path.dirname(__file__)#uses the parent folder of the program
-  path = dir + "\\"+"death.wav"#looks for eggs.txt in the parent directory
+  path = dir + "\\"+"death.wav"
   sd=makeSound(path)
   blockingPlay(sd)
   return sd
@@ -218,7 +218,7 @@ def playD():
 #win sound
 def playW():
   dir = os.path.dirname(__file__)#uses the parent folder of the program
-  path = dir + "\\"+"win.wav"#looks for eggs.txt in the parent directory
+  path = dir + "\\"+"win.wav"
   sd=makeSound(path)
   blockingPlay(sd)
   return sd
@@ -306,12 +306,11 @@ key_count = 0
 turncounter = 0 #turn counter
 demonCounter = 20 #turns until demon becomes active
 printMap(game_map, player)
-<<<<<<< HEAD
 
-=======
+
 print """Welcome to the dungeon! The goal is to navigate the map using W,A,S,D to collect enough keys to open the door and escape the labyrinth.\nBEWARE OF MONSTERS!
 Monsters move around the map and will eat the player if you are on the same space as them.\nThe resident demon seems to be watching your progress with amusement. Better move quickly before he gets bored of you...\nGood luck!"""
->>>>>>> 326bf045fd58b73e454222aed28151d467550f76
+
 while game_over == false:
   move_direction = requestString("Enter a direction:\n'W' to go up\n'A' to go left\n'S' to go down\n'D' to go right")
   moveMonsters(game_map)
@@ -328,12 +327,10 @@ while game_over == false:
       game_map[player['X']][player['Y']] = 'E'
     elif game_map[player['X']][player['Y']] == 'D' and key_count == NUM_KEYS: #WIN THE GAME!
       #printNow("YOU WIN! You escaped the labyrinth!")
-      playW()
       game_over = true
       win = true
     elif game_map[player['X']][player['Y']] == 'M': #OH NO MONSTER
       #showInformation("YOU LOSE! You were eaten by a monster! OH THE HORROR!")
-      playD()
       death = true
       game_over = true
     if turncounter == demonCounter/2:
@@ -358,6 +355,7 @@ while game_over == false:
       tileCopy(tile, 320, 128, world, 32+(32*player['X']), 32+(32*translate[player['Y']]))
       createText(world, "You're dead!", 40, 20, 50, 1)
       repaint(world)
+      playD()
     if win == true and death != true:
       turnBlack(world)
       tileCopy(tile, 384, 320, world, 100, 100)
@@ -377,7 +375,8 @@ while game_over == false:
       turnBlack(world)
       tileCopy(tile, 992, 352, world, 100, 100)
       createText(world, "You win!", 40, 20, 50, 0)
-      repaint(world)     
+      repaint(world)
+      playW()
       
       
   else:
