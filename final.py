@@ -165,14 +165,16 @@ def playD():
   dir = os.path.dirname(__file__)#uses the parent folder of the program
   path = dir + "\\"+"death.wav"#looks for eggs.txt in the parent directory
   sd=makeSound(path)
-  play(sd)
-
+  blockingPlay(sd)
+  return sd
+  
 #win sound
 def playW():
   dir = os.path.dirname(__file__)#uses the parent folder of the program
   path = dir + "\\"+"win.wav"#looks for eggs.txt in the parent directory
   sd=makeSound(path)
-  play(sd)
+  blockingPlay(sd)
+  return sd
 
 #Create a blank "world" and turn it black  
 world = makeEmptyPicture(64 + (32*MAP_SIZE), 64 + (32*MAP_SIZE))
@@ -196,13 +198,7 @@ show(world)
 translate = []
 u = MAP_SIZE-1
 for s in range (MAP_SIZE):
-#
-#
-#
   playB()#plays background when the map loads
-#
-#
-#
   translate.append(u) #This translates the y postition of the player for the graphics
   u -= 1
   
