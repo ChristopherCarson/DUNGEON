@@ -153,6 +153,27 @@ def turnBlack(pic):
     setRed(i,0)
   return pic
 
+#plays main background music
+def playB():
+  dir = os.path.dirname(__file__)#uses the parent folder of the program
+  path = dir + "\\"+"dmap.wav"#looks for eggs.txt in the parent directory
+  sd=makeSound(path)
+  play(sd)
+  
+#death sound  
+def playD():
+  dir = os.path.dirname(__file__)#uses the parent folder of the program
+  path = dir + "\\"+"death.wav"#looks for eggs.txt in the parent directory
+  sd=makeSound(path)
+  play(sd)
+
+#win sound
+def playW():
+  dir = os.path.dirname(__file__)#uses the parent folder of the program
+  path = dir + "\\"+"win.wav"#looks for eggs.txt in the parent directory
+  sd=makeSound(path)
+  play(sd)
+
 #Create a blank "world" and turn it black  
 world = makeEmptyPicture(64 + (32*MAP_SIZE), 64 + (32*MAP_SIZE))
 blackCanvas = makeEmptyPicture(32*MAP_SIZE, 32*MAP_SIZE)
@@ -175,6 +196,13 @@ show(world)
 translate = []
 u = MAP_SIZE-1
 for s in range (MAP_SIZE):
+#
+#
+#
+  playB()#plays background when the map loads
+#
+#
+#
   translate.append(u) #This translates the y postition of the player for the graphics
   u -= 1
   
@@ -231,10 +259,10 @@ death = false
 win = false
 key_count = 0
 printMap(game_map, player)
+
 while game_over == false:
   move_direction = requestString("Enter a direction:\n'W' for up\n'A' for left\n'S' for down\n'D' for right): ")
   moveMonsters(game_map)
-  
   player_moved = false
   if game_map[player['X']][player['Y']] == 'S': #Check for Spinning Room
     while not player_moved:
@@ -242,17 +270,18 @@ while game_over == false:
       player_moved = movePlayer(game_map,player,move_direction)
   else:
     player_moved = movePlayer(game_map,player,move_direction.upper())                
-  
   if player_moved:
     if game_map[player['X']][player['Y']] == 'K': #GET THE KEY
       key_count += 1
       game_map[player['X']][player['Y']] = 'E'
     elif game_map[player['X']][player['Y']] == 'D' and key_count == NUM_KEYS: #WIN THE GAME!
       #printNow("YOU WIN! You escaped the labyrinth!")
+      playW()
       game_over = true
       win = true
     elif game_map[player['X']][player['Y']] == 'M': #OH NO MONSTER
       #showInformation("YOU LOSE! You were eaten by a monster! OH THE HORROR!")
+      playD()
       death = true
       game_over = true
       
