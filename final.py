@@ -201,11 +201,10 @@ def turnBlack(pic):
   return pic
 
 #plays main background music
-def playB():
-  dir = os.path.dirname(__file__)#uses the parent folder of the program
-  path = dir + "\\"+"dmap.wav"
-  sd=makeSound(path)
-  play(sd)
+#def playB():
+dir = os.path.dirname(__file__)#uses the parent folder of the program
+path = dir + "\\"+"dmap.wav"
+sd=makeSound(path)
   
 #death sound  
 def playD():
@@ -245,7 +244,7 @@ show(world)
 translate = []
 u = MAP_SIZE-1
 for s in range (MAP_SIZE):
-  playB()#plays background when the map loads
+  #playB()#plays background when the map loads
   translate.append(u) #This translates the y postition of the player for the graphics
   u -= 1
   
@@ -307,9 +306,12 @@ turncounter = 0 #turn counter
 demonCounter = 20 #turns until demon becomes active
 printMap(game_map, player)
 
-
 print """Welcome to the dungeon! The goal is to navigate the map using W,A,S,D to collect enough keys to open the door and escape the labyrinth.\nBEWARE OF MONSTERS!
 Monsters move around the map and will eat the player if you are on the same space as them.\nThe resident demon seems to be watching your progress with amusement. Better move quickly before he gets bored of you...\nGood luck!"""
+play(sd)
+time.sleep(6)
+stopPlaying(sd)
+
 
 while game_over == false:
   move_direction = requestString("Enter a direction:\n'W' to go up\n'A' to go left\n'S' to go down\n'D' to go right")
@@ -345,6 +347,7 @@ while game_over == false:
       game_over = true
 
     printMap(game_map, player)
+    
     turncounter += 1 #increment turn counter
     if death == true and win != true:
       tileCopy(tile, 320, 128, world, 32+(32*player['X']), 32+(32*translate[player['Y']]))
