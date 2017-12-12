@@ -1,6 +1,6 @@
 #FINAL PROJECT CST 205
 #JOHN COFFELT, MICHAEL ROSE, RAUL RAMIREZ, CHRISTOPHER CARSON
-#Goal of the game is to navigate the map using N,S,E,W to collect enough keys to open the door and escape the labyrinth.
+#Goal of the game is to navigate the map using W,A,S,D to collect enough keys to open the door and escape the labyrinth.
 #BEWARE OF MONSTERS!
 #Monsters move around the map and will eat the player if the players lands on them or they land on the player.
 import random
@@ -13,6 +13,7 @@ NUM_MONSTERS = 5 #Monsters that search for the player.
 NUM_SPINNING_ROOMS = 2 #Spinning rooms send player off in random direction!
 NUM_KEYS = 3 #Keys needed to unlock an escape door.
 NUM_DOORS = 1 #Number of escape doors.
+NUM_DEMON = 1 #Number of evil chasing demons
 
 #Creates the blank map.                
 def createMap(size):
@@ -23,7 +24,7 @@ def createMap(size):
    return map
 
 #Creates a shuffled array of map features so that they can be randomly placed on the map.
-def createFeatureRandomSeed(mapSize, nMonsters, nSpinning_Rooms, nKeys, nDoors):            
+def createFeatureRandomSeed(mapSize, nMonsters, nSpinning_Rooms, nKeys, nDoors, nDemons):            
    features = [0] * (mapSize ** 2)
    for i in range(0, mapSize ** 2):
      if nMonsters > 0:
@@ -38,6 +39,9 @@ def createFeatureRandomSeed(mapSize, nMonsters, nSpinning_Rooms, nKeys, nDoors):
      elif nDoors > 0:
        features[i] = "D"
        nDoors -= 1
+     elif nDemons > 0:#demon stuff
+       features[i] = "C"
+       nDemons -= 1
      else:
        features[i] = "E"
    random.shuffle(features)
@@ -116,7 +120,50 @@ def moveMonsters(map):
     for y in range(len(map)):
       if map[x][y] == 'T':
         map[x][y] = 'M'
+#Move the demon towards the player
+#This may still have infinite loop bugs in the marked part will test throughout day
+def moveDemon(map,player):
+  playerX = player['X']
+  playerY = player['Y']
+  for x in range(len(map)):
+    for y in range(len(map)):
+      if map[x][y] == 'C':
+        spot_taken = true
+        demonX = 0
+        demonY = 0
+        while demonX >= len(map) or demonX < 0 or demonY >= len(map) or demonY < 0 or spot_taken:
+          if playerX - x > 0 and map[x+1][y] == 'E':#player is to right
+            demonX = x + 1 #move right
 
+          elif playerX - x < 0 and map[x-1][y] == 'E':#player is to left
+            demonX = x - 1 #move left
+          else:
+            demonX = x
+          if playerY - y > 0 and map[x][y+1] == 'E':#player is above
+            demonY = y + 1
+          elif playerY - y < 0 and map[x][y-1] == 'E': #player is below
+            demonY = y - 1
+          else:
+            demonY = y
+          if demonX < len(map) and demonX >= 0 and demonY < len(map) and demonY >= 0:
+          #infinite loop bugs here. possibly fixed but needs more testing
+            if (map[demonX][demonY] != 'E' or map[demonX][demonY] != 'E') and (demonX != x or demonY != y):
+              demonX = x
+              demonY = y
+              spot_taken = false
+            else:
+              spot_taken = false
+        map[x][y] = 'E' #Set demon's current position to empty.
+        map[demonX][demonY] = 'T' #Sets demon's new position to T. not sure if needed just copied the monster move function
+  
+  #Changes temp designation to C.
+  for x in range(len(map)):
+    for y in range(len(map)):
+      if map[x][y] == 'T':
+        map[x][y] = 'C'
+  
+  
+  
 #Function to grab tile from tileset and copy it into world
 def tileCopy(source, sourceX, sourceY, target, targetX, targetY):
   new_y = targetY - 1
@@ -220,8 +267,10 @@ def printMap(map, player):
       elif map[x][len(map) - y - 1] == 'P':
         tileCopy(tile, 384, 320, world, 32+(32*x), 32+(32*y))   
       elif map[x][len(map) - y - 1] == 'S':
-        tileCopy(tile, 256, 256, world, 32+(32*x), 32+(32*y))                 
-                                                        
+        tileCopy(tile, 256, 256, world, 32+(32*x), 32+(32*y)) 
+      elif map[x][len(map) - y - 1] == 'C':
+        tileCopy(tile, 800, 448, world, 32+(32*x), 32+(32*y))
+        
   map[player['X']][player['Y']] = current_room
   
   #Animate the player at the end of move
@@ -245,7 +294,7 @@ def createText(picture, text, size, x, y, c):
   
 #Create the game map.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 blank_map = createMap(MAP_SIZE)
-features = createFeatureRandomSeed(MAP_SIZE, NUM_MONSTERS, NUM_SPINNING_ROOMS, NUM_KEYS, NUM_DOORS)
+features = createFeatureRandomSeed(MAP_SIZE, NUM_MONSTERS, NUM_SPINNING_ROOMS, NUM_KEYS, NUM_DOORS, NUM_DEMON)
 game_map = addFeaturesToMap(blank_map, features)
 player = getRandomStart(game_map)
 
@@ -254,10 +303,17 @@ game_over = false
 death = false
 win = false
 key_count = 0
+turncounter = 0 #turn counter
+demonCounter = 20 #turns until demon becomes active
 printMap(game_map, player)
+<<<<<<< HEAD
 
+=======
+print """Welcome to the dungeon! The goal is to navigate the map using W,A,S,D to collect enough keys to open the door and escape the labyrinth.\nBEWARE OF MONSTERS!
+Monsters move around the map and will eat the player if you are on the same space as them.\nThe resident demon seems to be watching your progress with amusement. Better move quickly before he gets bored of you...\nGood luck!"""
+>>>>>>> 326bf045fd58b73e454222aed28151d467550f76
 while game_over == false:
-  move_direction = requestString("Enter a direction:\n'W' for up\n'A' for left\n'S' for down\n'D' for right): ")
+  move_direction = requestString("Enter a direction:\n'W' to go up\n'A' to go left\n'S' to go down\n'D' to go right")
   moveMonsters(game_map)
   player_moved = false
   if game_map[player['X']][player['Y']] == 'S': #Check for Spinning Room
@@ -280,8 +336,19 @@ while game_over == false:
       playD()
       death = true
       game_over = true
-      
+    if turncounter == demonCounter/2:
+      print "The demon seems to be losing interest. Better hurry up!"
+    if turncounter == demonCounter:
+      print "The demon is no longer amused by your presence and begins chasing you!"
+    if turncounter >= demonCounter:#starts moving the demon after a certain turn count
+      moveDemon(game_map,player)
+    
+    if game_map[player['X']][player['Y']] == 'C': #OH NO DEMON!!!!
+      death = true
+      game_over = true
+
     printMap(game_map, player)
+    turncounter += 1 #increment turn counter
     if death == true and win != true:
       tileCopy(tile, 320, 128, world, 32+(32*player['X']), 32+(32*translate[player['Y']]))
       world = deathColoredGlasses(world)
