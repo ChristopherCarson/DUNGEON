@@ -221,6 +221,14 @@ def playW():
   sd=makeSound(path)
   blockingPlay(sd)
   return sd
+  
+#win sound
+def playM():
+  dir = os.path.dirname(__file__)#uses the parent folder of the program
+  path = dir + "\\"+"suspence.wav"
+  sd=makeSound(path)
+  blockingPlay(sd)
+  return
 
 #Create a blank "world" and turn it black  
 world = makeEmptyPicture(64 + (32*MAP_SIZE), 64 + (32*MAP_SIZE))
@@ -309,7 +317,7 @@ printMap(game_map, player)
 print """Welcome to the dungeon! The goal is to navigate the map using W,A,S,D to collect enough keys to open the door and escape the labyrinth.\nBEWARE OF MONSTERS!
 Monsters move around the map and will eat the player if you are on the same space as them.\nThe resident demon seems to be watching your progress with amusement. Better move quickly before he gets bored of you...\nGood luck!"""
 play(sd)
-time.sleep(6)
+time.sleep(4.5)
 stopPlaying(sd)
 
 
@@ -347,6 +355,8 @@ while game_over == false:
       game_over = true
 
     printMap(game_map, player)
+    r = random.randint(0,6)
+    if r == 0: playM()
     
     turncounter += 1 #increment turn counter
     if death == true and win != true:
